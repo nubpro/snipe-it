@@ -10,8 +10,6 @@ jobs:
     name: FTP-Deploy-Action
     runs-on: ubuntu-latest
     steps:
-      - name: Run script
-        run: echo ${{ secrets.TEST_ENV }}
       - uses: actions/checkout@v2
         with:
           ref: production
