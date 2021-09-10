@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\Consumable;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Requests\ImageUploadRequest;
 
 class ConsumablesController extends Controller
 {
@@ -41,8 +42,16 @@ class ConsumablesController extends Controller
             $consumables->where('category_id','=',$request->input('category_id'));
         }
 
+        if ($request->filled('model_number')) {
+            $consumables->where('model_number','=',$request->input('model_number'));
+        }
+
         if ($request->filled('manufacturer_id')) {
             $consumables->where('manufacturer_id','=',$request->input('manufacturer_id'));
+        }
+
+        if ($request->filled('location_id')) {
+            $consumables->where('location_id','=',$request->input('location_id'));
         }
 
 
@@ -90,14 +99,15 @@ class ConsumablesController extends Controller
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v4.0]
-     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Http\Requests\ImageUploadRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ImageUploadRequest $request)
     {
         $this->authorize('create', Consumable::class);
         $consumable = new Consumable;
         $consumable->fill($request->all());
+        $consumable = $request->handleImages($consumable);
 
         if ($consumable->save()) {
             return response()->json(Helper::formatStandardApiResponse('success', $consumable, trans('admin/consumables/message.create.success')));
@@ -125,16 +135,17 @@ class ConsumablesController extends Controller
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v4.0]
-     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Http\Requests\ImageUploadRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ImageUploadRequest $request, $id)
     {
         $this->authorize('update', Consumable::class);
         $consumable = Consumable::findOrFail($id);
         $consumable->fill($request->all());
-
+        $consumable = $request->handleImages($consumable);
+        
         if ($consumable->save()) {
             return response()->json(Helper::formatStandardApiResponse('success', $consumable, trans('admin/consumables/message.update.success')));
         }

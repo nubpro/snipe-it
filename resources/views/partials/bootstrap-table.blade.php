@@ -595,11 +595,26 @@
         }
     }
 
+    function cleanFloat(number) {
+        if(!number) { // in a JavaScript context, meaning, if it's null or zero or unset
+            return 0.0;
+        }
+        if ("{{$snipeSettings->digit_separator}}" == "1.234,56") {
+            // yank periods, change commas to periods
+            periodless = number.toString().replace("\.","");
+            decimalfixed = periodless.replace(",",".");
+        } else {
+            // yank commas, that's it.
+            decimalfixed = number.toString().replace(",","");
+        }
+        return parseFloat(decimalfixed);
+    }
+
     function sumFormatter(data) {
         if (Array.isArray(data)) {
             var field = this.field;
             var total_sum = data.reduce(function(sum, row) {
-                return (sum) + (parseFloat(row[field]) || 0);
+                return (sum) + (cleanFloat(row[field]) || 0);
             }, 0);
             return numberWithCommas(total_sum.toFixed(2));
         }
@@ -608,9 +623,13 @@
 
     function numberWithCommas(value) {
         if ((value) && ("{{$snipeSettings->digit_separator}}" == "1.234,56")){
-        var parts = value.toString().split(".");
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        return parts.join(",");
+            var parts = value.toString().split(".");
+             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+             return parts.join(",");
+         } else {
+             var parts = value.toString().split(",");
+             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+             return parts.join(".");
         }
         return value
     }

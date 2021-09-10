@@ -46,7 +46,10 @@ class Helper
     public static function formatCurrencyOutput($cost)
     {
         if (is_numeric($cost)) {
-            return number_format($cost, 2, '.', '');
+            if (Setting::getSettings()->digit_separator=='1.234,56') {
+                return number_format($cost, 2, ',', '.');
+            }
+            return number_format($cost, 2, '.', ',');
         }
         // It's already been parsed.
         return $cost;
@@ -64,7 +67,7 @@ class Helper
     {
         $colors = [
             "#008941",
-            "#FF4A46",
+            "#FF851B",
             "#006FA6",
             "#A30059",
             "#1CE6FF",
@@ -887,7 +890,8 @@ class Helper
             // If upload_max_size is less, then reduce. Except if upload_max_size is
             // zero, which indicates no limit.
             $upload_max = Helper::parse_size(ini_get('upload_max_filesize'));
-            if ($upload_max > 0 && $upload_max < $max_size) {
+
+            if ($upload_max > 0 && $upload_max < $post_max_size) {
                 $max_size = ini_get('upload_max_filesize');
             }
         }

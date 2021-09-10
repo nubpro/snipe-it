@@ -22,7 +22,7 @@ class StatuslabelsController extends Controller
     public function index(Request $request)
     {
         $this->authorize('view', Statuslabel::class);
-        $allowed_columns = ['id','name','created_at', 'assets_count','color','default_label'];
+        $allowed_columns = ['id','name','created_at', 'assets_count','color', 'notes','default_label'];
 
         $statuslabels = Statuslabel::withCount('assets as assets_count');
 
@@ -176,7 +176,6 @@ class StatuslabelsController extends Controller
 
         foreach ($statuslabels as $statuslabel) {
             if ($statuslabel->assets_count > 0) {
-
                 $labels[]=$statuslabel->name. ' ('.number_format($statuslabel->assets_count).')';
                 $points[]=$statuslabel->assets_count;
 
@@ -184,8 +183,8 @@ class StatuslabelsController extends Controller
                     $colors_array[] = $statuslabel->color;
                 } else {
                     $colors_array[] = Helper::defaultChartColors($default_color_count);
-                    $default_color_count++;
                 }
+                $default_color_count++;
             }
         }
 
